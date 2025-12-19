@@ -139,3 +139,4 @@ python -c "from app_store_bot import AppStoreMonitor; m = AppStoreMonitor(); pri
 ## License
 
 This project is for educational and business intelligence purposes. Please respect app developers' privacy and terms of service.
+
