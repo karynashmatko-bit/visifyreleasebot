@@ -16,6 +16,7 @@ import logging
 from typing import List, Dict, Optional
 from dataclasses import dataclass
 from dotenv import load_dotenv
+from flask import Flask
 
 # Load environment variables from .env file
 load_dotenv()
@@ -262,6 +263,53 @@ class CompetitorMonitor:
         else:
             logger.info("No updates found for any competitors")
 
+# Flask app for health checks (needed for Render deployment)
+app = Flask(__name__)
+
+@app.route('/health')
+def health_check():
+    """Health check endpoint for Render"""
+    return {
+        'status': 'healthy',
+        'timestamp': datetime.now().isoformat(),
+        'service': 'App Store Competitor Monitor'
+    }
+
+@app.route('/')
+def root():
+    """Root endpoint"""
+    return {
+        'service': 'App Store Competitor Monitor Bot',
+        'status': 'running',
+        'health': '/health'
+    }
+
+def start_background_monitor():
+    """Start the monitoring in a background thread"""
+    import threading
+
+    def monitor_loop():
+        # Initialize monitor
+        monitor = CompetitorMonitor()
+
+        # Run initial check
+        monitor.check_for_updates()
+
+        # Schedule regular checks (every 60 minutes)
+        schedule.every(60).minutes.do(monitor.check_for_updates)
+
+        logger.info("Background monitor started. Checking for updates every 60 minutes...")
+
+        # Keep running
+        while True:
+            schedule.run_pending()
+            time.sleep(60)  # Check every minute for scheduled tasks
+
+    # Start monitoring in background thread
+    monitor_thread = threading.Thread(target=monitor_loop, daemon=True)
+    monitor_thread.start()
+    logger.info("Background monitoring thread started")
+
 def main():
     """Main function"""
     # Check for required environment variables
@@ -273,21 +321,13 @@ def main():
         logger.error("SLACK_CHANNEL environment variable not set")
         return
 
-    # Initialize monitor
-    monitor = CompetitorMonitor()
+    # Start background monitoring
+    start_background_monitor()
 
-    # Run initial check
-    monitor.check_for_updates()
-
-    # Schedule regular checks (every 60 minutes)
-    schedule.every(60).minutes.do(monitor.check_for_updates)
-
-    logger.info("Bot started. Checking for updates every 60 minutes...")
-
-    # Keep running
-    while True:
-        schedule.run_pending()
-        time.sleep(60)  # Check every minute for scheduled tasks
+    # Start Flask web server for health checks
+    port = int(os.environ.get('PORT', 5000))
+    logger.info(f"Starting web server on port {port}...")
+    app.run(host='0.0.0.0', port=port)
 
 if __name__ == "__main__":
     main()
