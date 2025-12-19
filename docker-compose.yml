@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  appstore-monitor:
+    build: .
+    container_name: appstore-competitor-bot
+    restart: unless-stopped
+    environment:
+      - SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN}
+      - SLACK_CHANNEL=${SLACK_CHANNEL}
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./last_check.json:/app/last_check.json
+      - ./competitors.json:/app/competitors.json
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('https://itunes.apple.com/lookup?id=544007664')"]
+      interval: 5m
+      timeout: 10s
+      retries: 3
+      start_period: 30s

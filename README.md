@@ -136,6 +136,99 @@ Run a quick test to verify everything works:
 python -c "from app_store_bot import AppStoreMonitor; m = AppStoreMonitor(); print(m.get_app_info('544007664'))"
 ```
 
+## Deployment
+
+### Quick Start (Local)
+
+1. **Clone and setup:**
+   ```bash
+   git clone https://github.com/karynashmatko-bit/visifyreleasebot.git
+   cd visifyreleasebot
+   cp env.example .env
+   # Edit .env with your SLACK_BOT_TOKEN and SLACK_CHANNEL
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Run:**
+   ```bash
+   python app_store_bot.py
+   ```
+
+### Docker Deployment
+
+```bash
+# Build and run with Docker
+docker build -t appstore-monitor .
+docker run -d --name appstore-monitor --env-file .env appstore-monitor
+
+# Or use Docker Compose
+docker-compose up -d
+```
+
+### Production Deployment Options
+
+#### 1. **Systemd Service (Linux Servers)**
+```bash
+sudo python deploy.py local  # Choose option 1
+```
+
+#### 2. **Cloud VPS (AWS/DigitalOcean/Google Cloud)**
+```bash
+# On your cloud server:
+git clone https://github.com/karynashmatko-bit/visifyreleasebot.git
+cd visifyreleasebot
+cp env.example .env
+# Configure .env with your credentials
+pip install -r requirements.txt
+python app_store_bot.py  # Consider using screen/tmux/nohup
+```
+
+#### 3. **Railway/Render (PaaS)**
+- Connect your GitHub repo
+- Set environment variables in dashboard
+- Deploy automatically on git push
+
+### Deployment Script
+
+Use the included deployment script for various options:
+
+```bash
+# Check system requirements
+python deploy.py check
+
+# Deploy locally
+python deploy.py local
+
+# Deploy with Docker
+python deploy.py docker
+
+# Deploy with Docker Compose
+python deploy.py docker-compose
+
+# Get cloud deployment info
+python deploy.py cloud
+```
+
+### Environment Variables
+
+Required environment variables in `.env`:
+```bash
+SLACK_BOT_TOKEN=xoxb-your-bot-token-here
+SLACK_CHANNEL=#your-channel-name
+LOG_LEVEL=INFO  # Optional: DEBUG, INFO, WARNING, ERROR
+```
+
+### Monitoring & Maintenance
+
+- **Logs**: Bot logs to console, redirect to file for persistence
+- **Health Check**: Test API connectivity every 5 minutes
+- **Restart**: Bot automatically restarts on failure
+- **Updates**: Pull latest code and restart to update
+
 ## License
 
 This project is for educational and business intelligence purposes. Please respect app developers' privacy and terms of service.
