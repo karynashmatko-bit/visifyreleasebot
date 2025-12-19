@@ -18,8 +18,10 @@ from dataclasses import dataclass
 from dotenv import load_dotenv
 from flask import Flask
 
-# Load environment variables from .env file
-load_dotenv()
+# Load environment variables from .env file (if it exists)
+# In production (Render), environment variables are set directly
+if os.path.exists('.env'):
+    load_dotenv()
 
 # Configure logging
 logging.basicConfig(
@@ -312,13 +314,21 @@ def start_background_monitor():
 
 def main():
     """Main function"""
+    # Debug: Log all environment variables (remove in production)
+    logger.info("Environment variables check:")
+    logger.info(f"SLACK_BOT_TOKEN: {'SET' if os.getenv('SLACK_BOT_TOKEN') else 'NOT SET'}")
+    logger.info(f"SLACK_CHANNEL: {'SET' if os.getenv('SLACK_CHANNEL') else 'NOT SET'}")
+    logger.info(f"Available env vars: {[k for k in os.environ.keys() if 'SLACK' in k]}")
+
     # Check for required environment variables
     if not os.getenv('SLACK_BOT_TOKEN'):
         logger.error("SLACK_BOT_TOKEN environment variable not set")
+        logger.error("Please set SLACK_BOT_TOKEN in Render environment variables")
         return
 
     if not os.getenv('SLACK_CHANNEL'):
         logger.error("SLACK_CHANNEL environment variable not set")
+        logger.error("Please set SLACK_CHANNEL in Render environment variables")
         return
 
     # Start background monitoring
