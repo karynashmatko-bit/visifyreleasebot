@@ -1,0 +1,20 @@
+{
+  "app_ids": [
+    "1470373330",
+    "6444888896",
+    "1658822260",
+    "1545593132",
+    "6737417022",
+    "1540719743"
+  ],
+  "app_names": [
+    "Remini – AI Photo Enhancer",
+    "AI Mirror: AI Photo Editor",
+    "Momo – AI Photo Generator",
+    "Glam AI: Video & Photo Editor",
+    "Pose AI: Photo & Video Studio",
+    "ToonApp: Turn Photos to AI Art"
+  ],
+  "description": "App Store IDs of AI photo editing competitor apps to monitor for new releases",
+  "note": "To find an app's ID, search for it on the App Store and copy the number after 'id' in the URL, or use tools like https://tools.applemediaservices.com/"
+}
