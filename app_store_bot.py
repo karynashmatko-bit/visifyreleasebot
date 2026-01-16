@@ -297,10 +297,10 @@ def start_background_monitor():
         # Run initial check
         monitor.check_for_updates()
 
-        # Schedule regular checks (every 60 minutes)
-        schedule.every(60).minutes.do(monitor.check_for_updates)
+        # Schedule regular checks (4 times a day, every 6 hours)
+        schedule.every(6).hours.do(monitor.check_for_updates)
 
-        logger.info("Background monitor started. Checking for updates every 60 minutes...")
+        logger.info("Background monitor started. Checking for updates every 6 hours...")
 
         # Keep running
         while True:
@@ -329,6 +329,14 @@ def main():
     if not os.getenv('SLACK_CHANNEL'):
         logger.error("SLACK_CHANNEL environment variable not set")
         logger.error("Please set SLACK_CHANNEL in Render environment variables")
+        return
+
+    # If RUN_ONCE is set, do a single check and exit (for cron/Actions)
+    run_once = os.getenv('RUN_ONCE', '').strip().lower() in ('1', 'true', 'yes')
+    if run_once:
+        logger.info("RUN_ONCE enabled: performing a single check and exiting")
+        monitor = CompetitorMonitor()
+        monitor.check_for_updates()
         return
 
     # Start background monitoring
