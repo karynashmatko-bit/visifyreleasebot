@@ -297,10 +297,10 @@ def start_background_monitor():
         # Run initial check
         monitor.check_for_updates()
 
-        # Schedule regular checks (4 times a day, every 6 hours)
-        schedule.every(6).hours.do(monitor.check_for_updates)
+        # Schedule regular checks (every 1 hour)
+        schedule.every(1).hours.do(monitor.check_for_updates)
 
-        logger.info("Background monitor started. Checking for updates every 6 hours...")
+        logger.info("Background monitor started. Checking for updates every 1 hour...")
 
         # Keep running
         while True:
